@@ -17,7 +17,7 @@ Next runs on Node rather than the Bun runtime on purpose: Bun ignores the connec
 ```bash
 docker compose up --build   # http://localhost:3000, reads .env.local, data persists in the `appdata` volume
 ```
-The image installs and builds with Bun (`bun install --frozen-lockfile`, binary from `oven/bun:1.4.4`) and runs `next start` on Node 24, non-root, with a `/api/health` healthcheck. Keys are passed at runtime, never baked into the image. Deploy target (Railway) runs this same Dockerfile with a volume at `/app/data`.
+The image installs and builds with Bun (`bun install --frozen-lockfile`, binary from `oven/bun:1.4.4`) and runs `next start` on Node 24, non-root, with a `/api/health` healthcheck. Keys are passed at runtime, never baked into the image. Deploy target (Railway) runs this same Dockerfile with a Railway Volume mounted at `/app/data`. Railway mounts volumes as root, so set `RAILWAY_RUN_UID=0` on the service or the non-root `node` user cannot write to it.
 
 ## Flow
 1. `POST /api/jobs` (multipart: `platform`, `formatId`, and `url` or `file`) validates input, stores a job in SQLite and returns `202 {id}`.

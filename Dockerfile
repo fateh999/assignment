@@ -13,10 +13,10 @@ ENV NODE_ENV=production PORT=3000
 # sharp/librsvg renders the overlay text; fontconfig maps Helvetica/Arial to Liberation Sans
 RUN apt-get update && apt-get install -y --no-install-recommends fontconfig fonts-liberation && rm -rf /var/lib/apt/lists/*
 COPY --from=build /app ./
-# Run as non-root; /app/data holds SQLite + generated files (mount a volume here)
+# Run as non-root; /app/data holds SQLite + generated files. Mount a volume there from the platform
+# (docker compose / Railway Volumes), not with VOLUME, which Railway rejects.
 RUN mkdir -p data && chown -R node:node data .next
 USER node
-VOLUME ["/app/data"]
 EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=5s CMD node -e "fetch('http://localhost:'+process.env.PORT+'/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
 # exec next directly (no package manager in between) so SIGTERM reaches node and in-flight requests can drain
